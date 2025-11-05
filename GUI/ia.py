@@ -209,7 +209,7 @@ if __name__ == "__main__":
     # SIMULAÇÃO 1: Apartamento Pequeno (Dispara R3 e R6)
     # -------------------------------------------------
     perfil_1 = {
-        "moradia": "Apartamento",
+        "moradia": "Casa",
         "tam_moradia": "Pequeno",
         "area_moradia": "Nao",
         "TempoPasseio": "Sim",
