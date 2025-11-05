@@ -162,7 +162,7 @@ class InferenceEngine:
 
 # -----------------------------------------------------------------
 # ARQUIVO: main.py
-# DESCRIÇÃO: Script principal que executa o sistema.
+# (Esta seção foi ATUALIZADA para entrada interativa)
 # -----------------------------------------------------------------
 
 def formatar_fatos(fatos):
@@ -170,20 +170,64 @@ def formatar_fatos(fatos):
     display = "  " + "\n  ".join(f"{k.ljust(15)}: {v}" for k, v in fatos.items())
     return display
 
-def executar_simulacao(motor, perfil_nome, fatos):
-    """Executa uma simulação completa para um perfil de cliente."""
-    print("---------------------------------------------------------")
-    print(f"Executando Simulação: {perfil_nome}")
+def fazer_pergunta(pergunta_texto, opcoes_validas):
+    """
+    Exibe uma pergunta e valida a resposta do usuário contra uma lista de opções.
+    """
+    print(f"\n{pergunta_texto}")
+    # Formata as opções para exibição, ex: (Casa / Apartamento)
+    opcoes_display = " / ".join(opcoes_validas)
+    print(f"(Opções: {opcoes_display})")
+    
+    while True:
+        # Padroniza a entrada: remove espaços e capitaliza a primeira letra
+        # Isso garante que 'casa' vire 'Casa' e 'nao' vire 'Nao'
+        resposta = input("Sua resposta: ").strip().capitalize()
+
+        if resposta in opcoes_validas:
+            return resposta
+        else:
+            print(f"--- Erro: Resposta '{resposta}' inválida. Por favor, use uma das opções: {opcoes_validas}")
+
+def executar_sistema_interativo():
+    """
+    Executa o fluxo principal do sistema especialista de forma interativa.
+    """
+    
+    # 1. Define as perguntas e suas opções válidas (que correspondem às regras)
+    mapa_perguntas = [
+        ("moradia", "Qual o tipo de imóvel que você mora?", ["Casa", "Apartamento"]),
+        ("tam_moradia", "Qual o Tamanho do imóvel?", ["Grande", "Pequeno"]),
+        ("area_moradia", "O imóvel possui área externa, como quintal?", ["Sim", "Nao"]),
+        ("TempoPasseio", "Você tem tempo para passeio?", ["Sim", "Nao"]),
+        ("interacao", "Você tem necessidade de toque, atenção, carinho... (interação)?", ["Sim", "Nao"]),
+        ("investimento", "O investimento que você pode ter para dar uma qualidade de vida é:", ["Alto", "Medio", "Baixo"]),
+    ]
+    
+    # 2. Inicializa o Motor de Inferência
+    # (Assume que 'REGRAS' e 'InferenceEngine' estão definidos acima no script)
+    motor = InferenceEngine(REGRAS)
+    
+    # 3. Coleta os Fatos do Usuário
+    print("--- Sistema Especialista de Recomendação de Pet ---")
+    print("Por favor, responda às 6 perguntas a seguir para definirmos seu perfil.")
+    
+    fatos_cliente = {}
+    for chave, texto_pergunta, opcoes in mapa_perguntas:
+        resposta_usuario = fazer_pergunta(texto_pergunta, opcoes)
+        fatos_cliente[chave] = resposta_usuario
+        
+    # 4. Processa os Fatos e Executa a Inferência
+    print("\n---------------------------------------------------------")
+    print("Processando seu perfil...")
     print("---------------------------------------------------------")
     
-    # Imprime os fatos de entrada
+    resultados, regras_disparadas = motor.inferir(fatos_cliente)
+    
+    # 5. Exibe o Relatório Final
     print("Fatos do Cliente (Entrada):")
-    print(formatar_fatos(fatos))
+    print(formatar_fatos(fatos_cliente))
     
-    # Executa a Inferência
-    resultados, regras_disparadas = motor.inferir(fatos)
-    
-    # Exibe o resultado
     print("\nRegras Disparadas:")
     if not regras_disparadas:
         print("  Nenhuma regra disparada.")
@@ -201,58 +245,5 @@ def executar_simulacao(motor, perfil_nome, fatos):
 
 # Ponto de entrada do script
 if __name__ == "__main__":
-    
-    # 1. Inicializa o Motor de Inferência com a Base de Conhecimento
-    motor = InferenceEngine(REGRAS)
-
-    # -------------------------------------------------
-    # SIMULAÇÃO 1: Apartamento Pequeno (Dispara R3 e R6)
-    # -------------------------------------------------
-    perfil_1 = {
-        "moradia": "Apartamento",
-        "tam_moradia": "Pequeno",
-        "area_moradia": "Nao",
-        "TempoPasseio": "Sim",
-        "interacao": "Sim",
-        "investimento": "Medio"
-    }
-    executar_simulacao(motor, "Perfil 1: Apto Pequeno com Interação", perfil_1)
-
-    # -------------------------------------------------
-    # SIMULAÇÃO 2: Observacional Baixo Custo (Dispara R7, R8, R11)
-    # -------------------------------------------------
-    perfil_2 = {
-        "moradia": "Apartamento",
-        "tam_moradia": "Pequeno",
-        "area_moradia": "Nao",
-        "TempoPasseio": "Nao",
-        "interacao": "Nao",
-        "investimento": "Baixo"
-    }
-    executar_simulacao(motor, "Perfil 2: Observacional de Baixo Custo", perfil_2)
-
-    # -------------------------------------------------
-    # SIMULAÇÃO 3: Casa Grande sem Quintal (Dispara R15)
-    # -------------------------------------------------
-    perfil_3 = {
-        "moradia": "Casa",
-        "tam_moradia": "Grande",
-        "area_moradia": "Nao",
-        "TempoPasseio": "Sim",
-        "interacao": "Sim",
-        "investimento": "Alto"
-    }
-    executar_simulacao(motor, "Perfil 3: Casa Grande sem Quintal", perfil_3)
-    
-    # -------------------------------------------------
-    # SIMULAÇÃO 4: Perfil Cão com Baixo Orçamento (Dispara R16)
-    # -------------------------------------------------
-    perfil_4 = {
-        "moradia": "Casa",
-        "tam_moradia": "Grande",
-        "area_moradia": "Sim",
-        "TempoPasseio": "Sim",
-        "interacao": "Sim",
-        "investimento": "Baixo"
-    }
-    executar_simulacao(motor, "Perfil 4: Perfil Cão com Baixo Orçamento", perfil_4)
+    # Agora executa o modo interativo em vez das simulações
+    executar_sistema_interativo()
