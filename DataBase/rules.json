@@ -1,0 +1,176 @@
+{
+  "priority": [
+    "Cachorro de Grande Porte",
+    "Cachorro de Médio Porte",
+    "Cachorro de Pequeno Porte",
+    "Gato",
+    "Pássaro",
+    "Réptil",
+    "Roedor",
+    "Peixe",
+    "Aracnídeo"
+  ],
+  "rules": [
+    {
+      "name": "R1_CAO_GRANDE_IDEAL",
+      "conditions": {
+        "moradia": "Casa",
+        "tam_moradia": "Grande",
+        "area_moradia": "Sim",
+        "TempoPasseio": "Sim",
+        "interacao": "Sim",
+        "investimento": "Alto"
+      },
+      "consequences": ["Cachorro de Grande Porte", "Cachorro de Médio Porte"],
+      "explanation": "Casa grande com quintal, tempo para passeio, desejo de interação e alto investimento favorecem cães de grande porte."
+    },
+    {
+      "name": "R2_CAO_MEDIO_ADAPTADO",
+      "conditions": {
+        "moradia": "Casa",
+        "tam_moradia": "Médio",
+        "area_moradia": "Sim",
+        "TempoPasseio": "Sim",
+        "interacao": "Sim"
+      },
+      "consequences": ["Cachorro de Médio Porte", "Cachorro de Pequeno Porte"],
+      "explanation": "Ambiente com espaço adequado e rotina ativa favorecem cães de médio e pequeno porte."
+    },
+    {
+      "name": "R3_CAO_PEQUENO_APARTAMENTO",
+      "conditions": {
+        "moradia": "Apartamento",
+        "tam_moradia": "Pequeno",
+        "area_moradia": "Não",
+        "TempoPasseio": "Sim"
+      },
+      "consequences": ["Cachorro de Pequeno Porte", "Gato"],
+      "explanation": "Apartamentos pequenos sem área externa exigem animais compactos e de fácil manejo, como cães pequenos ou gatos."
+    },
+    {
+      "name": "R4_GATO_IDEAL_APARTAMENTO",
+      "conditions": {
+        "moradia": "Apartamento",
+        "interacao": "Moderada",
+        "TempoPasseio": "Não"
+      },
+      "consequences": ["Gato"],
+      "explanation": "Quem não pode passear e deseja interação moderada se adapta melhor a gatos."
+    },
+    {
+      "name": "R5_PASSARO_POUCO_TEMPO",
+      "conditions": {
+        "interacao": "Pouca",
+        "TempoPasseio": "Não",
+        "investimento": "Baixo"
+      },
+      "consequences": ["Pássaro", "Peixe"],
+      "explanation": "Pássaros e peixes exigem pouca interação e custos mais baixos."
+    },
+    {
+      "name": "R6_ROEDOR_ALTA_INTERACAO_BAIXO_CUSTO",
+      "conditions": {
+        "interacao": "Sim",
+        "investimento": "Baixo"
+      },
+      "consequences": ["Roedor"],
+      "explanation": "Roedores como hamsters e porquinhos-da-índia são ótimos para interação com baixo investimento."
+    },
+    {
+      "name": "R7_REPTIL_AMBIENTE_CONTROLADO",
+      "conditions": {
+        "investimento": "Alto",
+        "moradia": "Casa"
+      },
+      "consequences": ["Réptil"],
+      "explanation": "Répteis exigem terrário e controle ambiental, geralmente com investimento maior."
+    },
+    {
+      "name": "R8_ARACNIDEO_MINIMA_INTERACAO",
+      "conditions": {
+        "interacao": "Pouca",
+        "TempoPasseio": "Não",
+        "investimento": "Baixo"
+      },
+      "consequences": ["Aracnídeo"],
+      "explanation": "Aracnídeos como tarântulas exigem manejo mínimo e baixo custo."
+    },
+    {
+      "name": "R9_PEIXE_AMBIENTE_PEQUENO",
+      "conditions": {
+        "tam_moradia": "Pequeno",
+        "investimento": "Baixo",
+        "interacao": "Pouca"
+      },
+      "consequences": ["Peixe"],
+      "explanation": "Peixes são ideais para ambientes pequenos, com baixa interação e custos reduzidos."
+    },
+    {
+      "name": "R10_GATO_MORADIA_MEDIA",
+      "conditions": {
+        "moradia": "Apartamento",
+        "tam_moradia": "Médio",
+        "interacao": "Sim"
+      },
+      "consequences": ["Gato"],
+      "explanation": "Apartamentos médios acomodam bem gatos, que demandam interação sem necessidade de passeio."
+    },
+    {
+      "name": "R11_CAO_MEDIO_APARTAMENTO_GRANDE",
+      "conditions": {
+        "moradia": "Apartamento",
+        "tam_moradia": "Grande",
+        "TempoPasseio": "Sim",
+        "interacao": "Sim"
+      },
+      "consequences": ["Cachorro de Médio Porte"],
+      "explanation": "Apartamentos grandes com tutores ativos favorecem cães de médio porte."
+    },
+    {
+      "name": "R12_CAO_PEQUENO_IDOSOS",
+      "conditions": {
+        "TempoPasseio": "Pouco",
+        "interacao": "Moderada"
+      },
+      "consequences": ["Cachorro de Pequeno Porte", "Gato"],
+      "explanation": "Pessoas com pouca mobilidade normalmente lidam melhor com cães pequenos ou gatos."
+    },
+    {
+      "name": "R13_PASSARO_AMBIENTE_TRANQUILO",
+      "conditions": {
+        "moradia": "Apartamento",
+        "interacao": "Pouca",
+        "investimento": "Médio"
+      },
+      "consequences": ["Pássaro"],
+      "explanation": "Pássaros se adaptam bem a apartamentos tranquilos com investimento moderado."
+    },
+    {
+      "name": "R14_ROEDOR_CRIANCAS",
+      "conditions": {
+        "interacao": "Alta",
+        "investimento": "Baixo"
+      },
+      "consequences": ["Roedor"],
+      "explanation": "Roedores são excelentes para crianças por serem interativos e baratos."
+    },
+    {
+      "name": "R15_REPTIL_POUCA_INTERACAO",
+      "conditions": {
+        "interacao": "Pouca",
+        "investimento": "Médio"
+      },
+      "consequences": ["Réptil"],
+      "explanation": "Répteis são ótimos para quem deseja pouca interação e investimento moderado."
+    },
+    {
+      "name": "R16_ARACNIDEO_CUSTO_ZERO",
+      "conditions": {
+        "investimento": "Muito Baixo",
+        "interacao": "Pouca"
+      },
+      "consequences": ["Aracnídeo"],
+      "explanation": "Aracnídeos podem ser mantidos com custo mínimo e baixa interação."
+    }
+  ]
+}
