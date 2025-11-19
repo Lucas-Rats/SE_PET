@@ -1,11 +1,11 @@
 # GUI/main_window.py
 """
 Sistema Especialista para Recomendação de Pets
-Interface Gráfica Principal - Versão Melhorada
+Interface Gráfica Principal - Versão Completa e Funcional
 """
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from GUI.controller import Controller
 
 
@@ -54,10 +54,6 @@ class App:
         # Container principal que irá conter todas as páginas empilhadas
         self.container = tk.Frame(root, bg=self.colors['background'])
         self.container.pack(fill="both", expand=True)
-        
-        # Configura para centralização
-        self.container.grid_rowconfigure(0, weight=1)
-        self.container.grid_columnconfigure(0, weight=1)
 
         # Dicionário para armazenar todas as páginas
         self.frames = {}
@@ -67,50 +63,13 @@ class App:
             page_name = F.__name__
             frame = F(parent=self.container, controller=self, colors=self.colors)
             self.frames[page_name] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
+            frame.place(relx=0, rely=0, relwidth=1, relheight=1)
 
-        # Configura estilos personalizados
-        self._configure_styles()
-        
         # Mostra a página inicial
         self.show_frame("HomePage")
         
         # Variável para armazenar dados de resultado
         self.result_data = None
-
-    def _configure_styles(self):
-        """
-        Configura estilos personalizados para os widgets ttk.
-        Define aparência consistente em toda a aplicação.
-        """
-        style = ttk.Style()
-        
-        # Frame principal
-        style.configure('Main.TFrame', background=self.colors['background'])
-        
-        # Botão primário (destaque)
-        style.configure('Primary.TButton',
-                       font=('Segoe UI', 11, 'bold'),
-                       padding=12,
-                       relief='flat')
-        
-        # Botão secundário
-        style.configure('Secondary.TButton',
-                       font=('Segoe UI', 10),
-                       padding=10,
-                       relief='flat')
-        
-        # Label de título
-        style.configure('Title.TLabel',
-                       font=('Segoe UI', 24, 'bold'),
-                       foreground=self.colors['text_dark'],
-                       background=self.colors['background'])
-        
-        # Label de subtítulo
-        style.configure('Subtitle.TLabel',
-                       font=('Segoe UI', 12),
-                       foreground=self.colors['text_light'],
-                       background=self.colors['background'])
 
     def show_frame(self, page_name):
         """
@@ -133,14 +92,14 @@ class App:
         recs, regras, explicacao = self.controller.run_analysis(facts)
         
         # Passa os resultados para a página de resultados
-        result_page: ResultPage = self.frames["ResultPage"]
+        result_page = self.frames["ResultPage"]
         result_page.set_result(recs, regras, explicacao, facts)
         
         # Exibe a página de resultados
         self.show_frame("ResultPage")
 
 
-class HomePage(ttk.Frame):
+class HomePage(tk.Frame):
     """
     Página inicial da aplicação.
     Apresenta o sistema e convida o usuário a iniciar o teste.
@@ -155,29 +114,13 @@ class HomePage(ttk.Frame):
             controller: Controlador principal da aplicação
             colors: Dicionário com as cores do tema
         """
-        super().__init__(parent)
+        super().__init__(parent, bg=colors['background'])
         self.app_controller = controller
         self.colors = colors
-        
-        # Configura o fundo
-        self.configure(style='Main.TFrame')
-        
-        # Configura grid para expansão total
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        
-        # Frame principal que ocupará todo o espaço
-        main_wrapper = tk.Frame(self, bg=self.colors['background'])
-        main_wrapper.grid(row=0, column=0, sticky='nsew')
-        
-        # Configura grid do wrapper para centralizar
-        main_wrapper.grid_rowconfigure(0, weight=1)
-        main_wrapper.grid_columnconfigure(0, weight=1)
-        
+
         # Container central para conteúdo
-        # Centralizado perfeitamente no meio da tela
-        content_frame = tk.Frame(main_wrapper, bg=self.colors['background'])
-        content_frame.grid(row=0, column=0)
+        content_frame = tk.Frame(self, bg=self.colors['background'])
+        content_frame.place(relx=0.5, rely=0.5, anchor='center')
 
         # Ícone decorativo (emoji de pet)
         icon_label = tk.Label(
@@ -220,8 +163,6 @@ class HomePage(ttk.Frame):
             highlightthickness=0
         )
         info_card.pack(pady=(0, 30), padx=40)
-        
-        # Não adiciona sombra/borda
 
         # Lista de benefícios/características
         benefits = [
@@ -244,11 +185,8 @@ class HomePage(ttk.Frame):
             benefit_label.pack(fill='x')
 
         # Botão para iniciar o teste
-        button_frame = tk.Frame(content_frame, bg=self.colors['background'])
-        button_frame.pack(pady=(30, 0))
-        
         start_btn = tk.Button(
-            button_frame,
+            content_frame,
             text="Iniciar Teste Agora",
             font=('Segoe UI', 13, 'bold'),
             bg=self.colors['primary'],
@@ -261,14 +199,14 @@ class HomePage(ttk.Frame):
             pady=15,
             command=lambda: controller.show_frame("QuestionsPage")
         )
-        start_btn.pack()
+        start_btn.pack(pady=(30, 0))
         
         # Efeito hover no botão
         start_btn.bind('<Enter>', lambda e: start_btn.config(bg=self.colors['secondary']))
         start_btn.bind('<Leave>', lambda e: start_btn.config(bg=self.colors['primary']))
 
 
-class QuestionsPage(ttk.Frame):
+class QuestionsPage(tk.Frame):
     """
     Página de perguntas do sistema.
     Coleta informações do usuário através de um formulário interativo.
@@ -283,12 +221,9 @@ class QuestionsPage(ttk.Frame):
             controller: Controlador principal da aplicação
             colors: Dicionário com as cores do tema
         """
-        super().__init__(parent)
+        super().__init__(parent, bg=colors['background'])
         self.app_controller = controller
         self.colors = colors
-        
-        # Configura fundo
-        self.configure(style='Main.TFrame')
 
         # Header fixo com título
         header = tk.Frame(self, bg=self.colors['primary'], height=100)
@@ -303,59 +238,77 @@ class QuestionsPage(ttk.Frame):
         )
         header_title.pack(pady=30)
 
-        # Container principal para área de scroll
-        main_container = tk.Frame(self, bg=self.colors['background'])
-        main_container.pack(fill='both', expand=True, side='top')
+        # Frame principal para centralização
+        main_frame = tk.Frame(self, bg=self.colors['background'])
+        main_frame.pack(fill='both', expand=True)
 
-        # Canvas para permitir scroll
-        canvas = tk.Canvas(
-            main_container,
+        # Canvas para scroll
+        self.canvas = tk.Canvas(
+            main_frame,
             bg=self.colors['background'],
             highlightthickness=0
         )
         
         # Scrollbar vertical
-        scrollbar = ttk.Scrollbar(
-            main_container,
-            orient="vertical",
-            command=canvas.yview
-        )
+        scrollbar = tk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=scrollbar.set)
         
-        # Frame que conterá todo o conteúdo scrollável
-        scrollable_frame = tk.Frame(canvas, bg=self.colors['background'])
+        self.canvas.pack(side='left', fill='both', expand=True)
+        scrollbar.pack(side='right', fill='y')
 
-        # Atualiza região de scroll quando o conteúdo muda
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        # Frame scrollável CENTRALIZADO
+        self.scrollable_frame = tk.Frame(self.canvas, bg=self.colors['background'])
+
+        # Cria a janela no canvas - CENTRALIZADA
+        self.canvas_window = self.canvas.create_window(
+            0, 0,  # Será reposicionado no configure
+            window=self.scrollable_frame,
+            anchor="n"
         )
 
-        # Cria janela no canvas para o frame scrollável
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="n")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        # Função para centralizar e configurar scroll
+        def configure_scroll(event=None):
+            # Atualiza região de scroll
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+            
+            # Centraliza horizontalmente
+            canvas_width = self.canvas.winfo_width()
+            frame_width = self.scrollable_frame.winfo_reqwidth()
+            x_position = max(0, (canvas_width - frame_width) // 2)
+            
+            self.canvas.coords(self.canvas_window, x_position, 0)
 
-        # Posiciona canvas e scrollbar
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        self.scrollable_frame.bind("<Configure>", configure_scroll)
+        self.canvas.bind("<Configure>", configure_scroll)
 
-        # Habilita scroll com mouse wheel
+        # Scroll SUAVE com mouse wheel
         def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
         
-        # Centraliza o conteúdo horizontalmente
-        def _center_window(event):
-            canvas_width = event.width
-            canvas.itemconfig(canvas.create_window((0, 0), window=scrollable_frame, anchor="n"), 
-                            width=min(canvas_width, 900))
-        canvas.bind('<Configure>', _center_window)
+        def _bind_mousewheel(event):
+            self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        
+        def _unbind_mousewheel(event):
+            self.canvas.unbind_all("<MouseWheel>")
+        
+        # Bind do scroll funcionando em toda a página
+        self.canvas.bind("<Enter>", _bind_mousewheel)
+        self.canvas.bind("<Leave>", _unbind_mousewheel)
+        
+        # Também funciona quando o mouse está sobre os elementos internos
+        self.scrollable_frame.bind("<Enter>", _bind_mousewheel)
+        self.scrollable_frame.bind("<Leave>", _unbind_mousewheel)
 
-        # Dicionário para armazenar as variáveis das respostas
+        # Container para perguntas (largura fixa)
+        questions_container = tk.Frame(
+            self.scrollable_frame, 
+            bg=self.colors['background'], 
+            width=800
+        )
+        questions_container.pack(pady=30, padx=40)
+
+        # Dicionário para armazenar respostas
         self.vars = {}
-        
-        # Container para as perguntas com largura máxima e centralizado
-        questions_container = tk.Frame(scrollable_frame, bg=self.colors['background'])
-        questions_container.pack(fill='both', expand=True, padx=100, pady=20)
 
         # Define todas as perguntas do sistema
         perguntas = [
@@ -386,16 +339,15 @@ class QuestionsPage(ttk.Frame):
 
         # Cria um card para cada pergunta
         for idx, (key, text, options, hint) in enumerate(perguntas, 1):
-            # Card da pergunta com sombra suave
+            # Card da pergunta
             card = tk.Frame(
                 questions_container,
                 bg=self.colors['card'],
-                relief='solid',
-                bd=1,
+                relief='flat',
+                bd=0,
                 highlightthickness=0
             )
             card.pack(fill='x', pady=12)
-            card.configure(borderwidth=0)  # Remove bordas completamente
             
             # Container interno com padding
             card_content = tk.Frame(card, bg=self.colors['card'])
@@ -410,7 +362,8 @@ class QuestionsPage(ttk.Frame):
                 fg=self.colors['text_dark'],
                 bg=self.colors['card'],
                 anchor='w',
-                justify='left'
+                justify='left',
+                wraplength=700
             )
             lbl.pack(anchor='w', pady=(0, 5))
             
@@ -421,7 +374,8 @@ class QuestionsPage(ttk.Frame):
                 font=('Segoe UI', 9, 'italic'),
                 fg=self.colors['text_light'],
                 bg=self.colors['card'],
-                anchor='w'
+                anchor='w',
+                wraplength=700
             )
             hint_lbl.pack(anchor='w', pady=(0, 15))
 
@@ -429,11 +383,11 @@ class QuestionsPage(ttk.Frame):
             var = tk.StringVar(value=options[0])
             self.vars[key] = var
 
-            # Frame para os botões de opção (horizontal)
+            # Frame para os botões de opção
             btn_frame = tk.Frame(card_content, bg=self.colors['card'])
             btn_frame.pack(anchor='w', pady=(5, 0))
             
-            # Cria radiobuttons estilizados para cada opção
+            # Cria radiobuttons para cada opção
             for opt in options:
                 rb = tk.Radiobutton(
                     btn_frame,
@@ -452,14 +406,14 @@ class QuestionsPage(ttk.Frame):
                     pady=8
                 )
                 rb.pack(side="left", padx=(0, 15))
-
-        # Espaçador
-        spacer = tk.Frame(questions_container, bg=self.colors['background'], height=30)
-        spacer.pack()
+                
+                # Scroll também funciona sobre os radiobuttons
+                rb.bind("<Enter>", _bind_mousewheel)
+                rb.bind("<Leave>", _unbind_mousewheel)
 
         # Frame para botões de ação
         action_frame = tk.Frame(questions_container, bg=self.colors['background'])
-        action_frame.pack(pady=20)
+        action_frame.pack(pady=30)
         
         # Botão para voltar
         back_btn = tk.Button(
@@ -477,11 +431,10 @@ class QuestionsPage(ttk.Frame):
         )
         back_btn.pack(side='left', padx=10)
         
-        # Efeito hover no botão voltar
         back_btn.bind('<Enter>', lambda e: back_btn.config(bg='#F0F0F0'))
         back_btn.bind('<Leave>', lambda e: back_btn.config(bg='white'))
 
-        # Botão para concluir e ver resultados
+        # Botão para concluir
         concluir_btn = tk.Button(
             action_frame,
             text="Ver Resultados →",
@@ -497,34 +450,28 @@ class QuestionsPage(ttk.Frame):
         )
         concluir_btn.pack(side='left', padx=10)
         
-        # Efeito hover no botão concluir
         concluir_btn.bind('<Enter>', lambda e: concluir_btn.config(bg=self.colors['primary']))
         concluir_btn.bind('<Leave>', lambda e: concluir_btn.config(bg=self.colors['success']))
 
     def on_conclude(self):
         """
         Valida as respostas e executa a inferência.
-        Chamado quando o usuário clica em "Ver Resultados".
         """
-        # Coleta todas as respostas em um dicionário de fatos
         facts = {k: v.get() for k, v in self.vars.items()}
         
-        # Valida se todas as perguntas foram respondidas
         missing = [k for k, v in facts.items() if v is None or v == ""]
         
         if missing:
-            # Exibe mensagem de erro se houver campos vazios
-            tk.messagebox.showerror(
+            messagebox.showerror(
                 "Atenção",
                 "Por favor, responda todas as perguntas antes de continuar."
             )
             return
         
-        # Executa inferência e mostra resultados
         self.app_controller.run_inference_and_show(facts)
 
 
-class ResultPage(ttk.Frame):
+class ResultPage(tk.Frame):
     """
     Página de resultados do sistema.
     Exibe a recomendação principal, alternativas e explicações detalhadas.
@@ -539,12 +486,9 @@ class ResultPage(ttk.Frame):
             controller: Controlador principal da aplicação
             colors: Dicionário com as cores do tema
         """
-        super().__init__(parent)
+        super().__init__(parent, bg=colors['background'])
         self.app_controller = controller
         self.colors = colors
-        
-        # Configura fundo
-        self.configure(style='Main.TFrame')
 
         # Header fixo
         header = tk.Frame(self, bg=self.colors['success'], height=80)
@@ -559,51 +503,75 @@ class ResultPage(ttk.Frame):
         )
         self.header_title.pack(pady=25)
 
-        # Container principal
-        main_container = tk.Frame(self, bg=self.colors['background'])
-        main_container.pack(fill='both', expand=True)
+        # Frame principal para centralização
+        main_frame = tk.Frame(self, bg=self.colors['background'])
+        main_frame.pack(fill='both', expand=True)
 
         # Canvas para scroll
-        canvas = tk.Canvas(
-            main_container,
+        self.scroll_canvas = tk.Canvas(
+            main_frame,
             bg=self.colors['background'],
             highlightthickness=0
         )
-        scrollbar = ttk.Scrollbar(main_container, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg=self.colors['background'])
+        
+        # Scrollbar vertical
+        scrollbar = tk.Scrollbar(main_frame, orient="vertical", command=self.scroll_canvas.yview)
+        self.scroll_canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.scroll_canvas.pack(side='left', fill='both', expand=True)
+        scrollbar.pack(side='right', fill='y')
 
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        # Frame scrollável CENTRALIZADO
+        self.scrollable_frame = tk.Frame(self.scroll_canvas, bg=self.colors['background'])
+
+        # Cria a janela no canvas - CENTRALIZADA
+        self.canvas_window = self.scroll_canvas.create_window(
+            0, 0,  # Será reposicionado no configure
+            window=self.scrollable_frame,
+            anchor="n"
         )
 
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="n")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        # Função para centralizar e configurar scroll
+        def configure_scroll(event=None):
+            # Atualiza região de scroll
+            self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"))
+            
+            # Centraliza horizontalmente
+            canvas_width = self.scroll_canvas.winfo_width()
+            frame_width = self.scrollable_frame.winfo_reqwidth()
+            x_position = max(0, (canvas_width - frame_width) // 2)
+            
+            self.scroll_canvas.coords(self.canvas_window, x_position, 0)
 
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        self.scrollable_frame.bind("<Configure>", configure_scroll)
+        self.scroll_canvas.bind("<Configure>", configure_scroll)
 
-        # Habilita scroll com mouse
+        # Scroll SUAVE com mouse wheel
         def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+            self.scroll_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
         
-        # Centraliza o conteúdo horizontalmente
-        def _center_window(event):
-            canvas_width = event.width
-            canvas.itemconfig(canvas.create_window((0, 0), window=scrollable_frame, anchor="n"), 
-                            width=min(canvas_width, 1000))
-        canvas.bind('<Configure>', _center_window)
+        def _bind_mousewheel(event):
+            self.scroll_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        
+        def _unbind_mousewheel(event):
+            self.scroll_canvas.unbind_all("<MouseWheel>")
+        
+        # Bind do scroll funcionando em toda a página
+        self.scroll_canvas.bind("<Enter>", _bind_mousewheel)
+        self.scroll_canvas.bind("<Leave>", _unbind_mousewheel)
+        
+        # Também funciona quando o mouse está sobre os elementos internos
+        self.scrollable_frame.bind("<Enter>", _bind_mousewheel)
+        self.scrollable_frame.bind("<Leave>", _unbind_mousewheel)
 
-        # Container principal de conteúdo centralizado
-        content = tk.Frame(scrollable_frame, bg=self.colors['background'])
-        content.pack(fill='both', expand=True, padx=100, pady=20)
+        # Container de conteúdo (largura fixa)
+        content = tk.Frame(self.scrollable_frame, bg=self.colors['background'], width=850)
+        content.pack(pady=30, padx=40)
 
-        # Card principal com a recomendação
+        # Card principal
         main_card = tk.Frame(content, bg=self.colors['card'], relief='flat', bd=0, highlightthickness=0)
         main_card.pack(fill='x', pady=(0, 20))
 
-        # Label para o pet recomendado
         self.main_lbl = tk.Label(
             main_card,
             text="",
@@ -613,8 +581,8 @@ class ResultPage(ttk.Frame):
         )
         self.main_lbl.pack(pady=(25, 10))
 
-        # Canvas para imagem ilustrativa do pet
-        self.canvas = tk.Canvas(
+        # Canvas para imagem do pet (renomeado para evitar conflito)
+        self.pet_canvas = tk.Canvas(
             main_card,
             width=280,
             height=200,
@@ -622,9 +590,9 @@ class ResultPage(ttk.Frame):
             highlightthickness=0,
             relief='flat'
         )
-        self.canvas.pack(pady=(10, 25))
+        self.pet_canvas.pack(pady=(10, 25))
 
-        # Separator visual
+        # Separator
         sep1 = tk.Frame(content, bg='#E0E0E0', height=2)
         sep1.pack(fill='x', pady=20)
 
@@ -636,7 +604,7 @@ class ResultPage(ttk.Frame):
         sep2 = tk.Frame(content, bg='#E0E0E0', height=2)
         sep2.pack(fill='x', pady=20)
 
-        # Seção de explicação detalhada
+        # Seção de explicação
         explanation_label = tk.Label(
             content,
             text="📊 Análise Detalhada",
@@ -651,7 +619,7 @@ class ResultPage(ttk.Frame):
         explanation_card = tk.Frame(content, bg=self.colors['card'], relief='flat', bd=0, highlightthickness=0)
         explanation_card.pack(fill='both', expand=True, pady=(0, 20))
 
-        # Text widget para explicação detalhada
+        # Text widget
         self.text = tk.Text(
             explanation_card,
             height=14,
@@ -661,10 +629,7 @@ class ResultPage(ttk.Frame):
             fg=self.colors['text_dark'],
             relief='flat',
             padx=20,
-            pady=15,
-            spacing1=5,
-            spacing2=3,
-            spacing3=5
+            pady=15
         )
         self.text.pack(fill='both', expand=True, padx=5, pady=5)
 
@@ -672,11 +637,11 @@ class ResultPage(ttk.Frame):
         sep3 = tk.Frame(content, bg='#E0E0E0', height=2)
         sep3.pack(fill='x', pady=20)
 
-        # Frame para botões de ação
+        # Frame para botões
         btn_frame = tk.Frame(content, bg=self.colors['background'])
         btn_frame.pack(pady=20)
         
-        # Botão para refazer o teste
+        # Botão refazer
         retry_btn = tk.Button(
             btn_frame,
             text="🔄 Refazer Teste",
@@ -695,7 +660,7 @@ class ResultPage(ttk.Frame):
         retry_btn.bind('<Enter>', lambda e: retry_btn.config(bg='#F0F0F0'))
         retry_btn.bind('<Leave>', lambda e: retry_btn.config(bg='white'))
         
-        # Botão para voltar ao início
+        # Botão home
         home_btn = tk.Button(
             btn_frame,
             text="🏠 Voltar ao Início",
@@ -715,28 +680,17 @@ class ResultPage(ttk.Frame):
         home_btn.bind('<Leave>', lambda e: home_btn.config(bg=self.colors['primary']))
 
     def set_result(self, recomendacoes, regras_disparadas, explicacao, facts=None):
-        """
-        Define e exibe os resultados da inferência.
-        
-        Args:
-            recomendacoes: Lista de pets recomendados (ordenada por prioridade)
-            regras_disparadas: Lista de regras que foram ativadas
-            explicacao: Texto explicativo completo
-            facts: Dicionário com os fatos fornecidos pelo usuário
-        """
-        # Limpa alternativas anteriores
+        """Define e exibe os resultados."""
+        # Limpa alternativas
         for widget in self.alternatives_frame.winfo_children():
             widget.destroy()
 
         if recomendacoes:
-            # Pet principal recomendado
             main = recomendacoes[0]
             self.main_lbl.config(text=f"🎯 {main}")
             
-            # Desenha ilustração do pet
             self._draw_pet_illustration(main)
             
-            # Exibe alternativas se houver mais de uma recomendação
             if len(recomendacoes) > 1:
                 alt_title = tk.Label(
                     self.alternatives_frame,
@@ -748,12 +702,10 @@ class ResultPage(ttk.Frame):
                 )
                 alt_title.pack(anchor='w', pady=(0, 15))
                 
-                # Grid de alternativas
                 alt_container = tk.Frame(self.alternatives_frame, bg=self.colors['background'])
                 alt_container.pack(fill='x')
                 
                 for idx, pet in enumerate(recomendacoes[1:], start=1):
-                    # Card para cada alternativa
                     alt_card = tk.Frame(
                         alt_container,
                         bg=self.colors['card'],
@@ -763,11 +715,9 @@ class ResultPage(ttk.Frame):
                     )
                     alt_card.pack(fill='x', pady=8)
                     
-                    # Conteúdo do card
                     card_content = tk.Frame(alt_card, bg=self.colors['card'])
                     card_content.pack(fill='x', padx=20, pady=15)
                     
-                    # Ícone e nome do pet
                     pet_icon = self._get_pet_emoji(pet)
                     pet_label = tk.Label(
                         card_content,
@@ -779,7 +729,6 @@ class ResultPage(ttk.Frame):
                     )
                     pet_label.pack(anchor='w')
                     
-                    # Descrição
                     desc_label = tk.Label(
                         card_content,
                         text=f"Alternativa {idx} - Também compatível com seu perfil",
@@ -791,143 +740,59 @@ class ResultPage(ttk.Frame):
                     desc_label.pack(anchor='w', pady=(5, 0))
 
         else:
-            # Caso não haja recomendações
             self.main_lbl.config(text="❌ Nenhuma recomendação encontrada")
-            self.canvas.delete("all")
-            self.canvas.create_text(
-                140, 100,
-                text="😕",
-                font=("Arial", 64),
-                fill=self.colors['text_light']
-            )
+            self.pet_canvas.delete("all")
 
-        # Insere explicação no text widget
+        # Insere explicação
         self.text.configure(state="normal")
         self.text.delete("1.0", tk.END)
         self.text.insert(tk.END, explicacao)
         self.text.configure(state="disabled")
 
     def _draw_pet_illustration(self, pet):
-        """
-        Desenha uma ilustração visual do pet recomendado.
-        
-        Args:
-            pet: Nome do pet a ser ilustrado
-        """
-        self.canvas.delete("all")
+        """Desenha ilustração do pet."""
+        self.pet_canvas.delete("all")
         pet_lower = pet.lower()
         
-        # Define cores e forma baseado no tipo de pet
         if "cachorro" in pet_lower:
-            # Círculo marrom para cachorro
-            self.canvas.create_oval(
-                40, 40, 240, 180,
-                fill='#F4E4C1',
-                outline='#D4A574',
-                width=3
-            )
+            self.pet_canvas.create_oval(40, 40, 240, 180, fill='#F4E4C1', outline='#D4A574', width=3)
             emoji = "🐶"
             bg_color = '#FFF8E7'
-            
         elif "gato" in pet_lower:
-            # Círculo laranja para gato
-            self.canvas.create_oval(
-                40, 40, 240, 180,
-                fill='#FFE5D0',
-                outline='#E89B6D',
-                width=3
-            )
+            self.pet_canvas.create_oval(40, 40, 240, 180, fill='#FFE5D0', outline='#E89B6D', width=3)
             emoji = "🐱"
             bg_color = '#FFF5ED'
-            
         elif "peixe" in pet_lower:
-            # Retângulo azul para peixe (aquário)
-            self.canvas.create_rectangle(
-                40, 50, 240, 170,
-                fill='#D6F0FF',
-                outline='#6BB6D6',
-                width=3
-            )
+            self.pet_canvas.create_rectangle(40, 50, 240, 170, fill='#D6F0FF', outline='#6BB6D6', width=3)
             emoji = "🐟"
             bg_color = '#E8F8FF'
-            
         elif "réptil" in pet_lower or "reptil" in pet_lower:
-            # Retângulo verde para réptil
-            self.canvas.create_rectangle(
-                40, 50, 240, 170,
-                fill='#E0F5E0',
-                outline='#8FBC8F',
-                width=3
-            )
+            self.pet_canvas.create_rectangle(40, 50, 240, 170, fill='#E0F5E0', outline='#8FBC8F', width=3)
             emoji = "🦎"
             bg_color = '#F0FFF0'
-            
         elif "pássaro" in pet_lower or "passaro" in pet_lower:
-            # Círculo amarelo para pássaro
-            self.canvas.create_oval(
-                40, 40, 240, 180,
-                fill='#FFF9D6',
-                outline='#E6D05C',
-                width=3
-            )
+            self.pet_canvas.create_oval(40, 40, 240, 180, fill='#FFF9D6', outline='#E6D05C', width=3)
             emoji = "🐦"
             bg_color = '#FFFEF0'
-            
         elif "roedor" in pet_lower:
-            # Círculo bege para roedor
-            self.canvas.create_oval(
-                40, 40, 240, 180,
-                fill='#F5E6D3',
-                outline='#C9A876',
-                width=3
-            )
+            self.pet_canvas.create_oval(40, 40, 240, 180, fill='#F5E6D3', outline='#C9A876', width=3)
             emoji = "🐹"
             bg_color = '#FFF8F0'
-            
         elif "aracnídeo" in pet_lower or "aracnideo" in pet_lower:
-            # Polígono escuro para aracnídeo
-            self.canvas.create_rectangle(
-                40, 50, 240, 170,
-                fill='#E8E0D8',
-                outline='#8B7355',
-                width=3
-            )
+            self.pet_canvas.create_rectangle(40, 50, 240, 170, fill='#E8E0D8', outline='#8B7355', width=3)
             emoji = "🕷️"
             bg_color = '#F5F0EB'
-            
         else:
-            # Default genérico
-            self.canvas.create_oval(
-                40, 40, 240, 180,
-                fill='#F0F0F0',
-                outline='#999999',
-                width=3
-            )
+            self.pet_canvas.create_oval(40, 40, 240, 180, fill='#F0F0F0', outline='#999999', width=3)
             emoji = "🐾"
             bg_color = '#F8F8F8'
         
-        # Aplica cor de fundo
-        self.canvas.configure(bg=bg_color)
-        
-        # Desenha emoji grande no centro
-        self.canvas.create_text(
-            140, 110,
-            text=emoji,
-            font=("Segoe UI Emoji", 72)
-        )
+        self.pet_canvas.configure(bg=bg_color)
+        self.pet_canvas.create_text(140, 110, text=emoji, font=("Segoe UI Emoji", 72))
 
     def _get_pet_emoji(self, pet):
-        """
-        Retorna o emoji correspondente ao tipo de pet.
-        
-        Args:
-            pet: Nome do pet
-            
-        Returns:
-            String com o emoji correspondente
-        """
+        """Retorna emoji do pet."""
         pet_lower = pet.lower()
-        
         if "cachorro" in pet_lower:
             return "🐶"
         elif "gato" in pet_lower:
@@ -942,15 +807,11 @@ class ResultPage(ttk.Frame):
             return "🐹"
         elif "aracnídeo" in pet_lower or "aracnideo" in pet_lower:
             return "🕷️"
-        else:
-            return "🐾"
+        return "🐾"
 
 
 def start_app():
-    """
-    Função principal para iniciar a aplicação.
-    Cria a janela raiz do Tkinter e inicializa a aplicação.
-    """
+    """Função principal para iniciar a aplicação."""
     root = tk.Tk()
     app = App(root)
     root.mainloop()
